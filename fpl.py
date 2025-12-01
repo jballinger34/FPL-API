@@ -2,15 +2,16 @@ from bs4 import BeautifulSoup
 import requests
 
 class Player:
-    def __init__(self,id,name,team,cost,points,minutes):
+    def __init__(self,id,name,team,cost,points,minutes, position):
         self.id = id
         self.name = name
         self.team = team
         self.cost = cost
         self.points = points
         self.minutes = minutes
+        self.position = position
     def printStats(self):
-        print(self.name)
+        print(self.name + " position: " + self.position + ", team: " + self.team +", costs: " + str(self.cost) + ", points: " + str(self.points))
 
 def sortByPoints(playerList):
     playerList.sort(key=lambda p: p.points, reverse =True)
@@ -19,10 +20,21 @@ def sortByPoints(playerList):
 def sortByPointsOverCost(playerList):
     playerList.sort(key=lambda p: (p.points/p.cost), reverse = True)
     return playerList
+
+def getPosition(playerList, position):
+    toReturn = []
+    for player in playerList:
+        if player.position == position:
+            toReturn.append(player)
+    return toReturn
+
+
 teams = [ "Arsenal", "Villa", "Burnley", "Bournemouth",
          "Brentford", "Brighton", "Chelsea", "Palace", "Everton",
          "Fulham", "Leeds", "Liverpool", "Man City", "Man United",
          "Newcastle", "Forest", "Sunderland", "Spurs", "West Ham", "Wolves" ]
+positions = ["GK","DEF","MID","FWD"]
+
 """
 url = "https://fantasy.premierleague.com/api/fixtures/"
 fixtures = requests.get(url).json()
@@ -57,10 +69,12 @@ for p in res["elements"]:
         team = teams[p["team"]-1],
         cost = p["now_cost"],
         points = p["total_points"],
-        minutes = p["minutes"]
+        minutes = p["minutes"],
+        position = positions[p["element_type"]-1]
     ))
-
-playerList = sortByPoints(playerList)
-playerList[0].printStats()
+#playerList = sortByPoints(playerList)
+#playerList[0].printStats()
+playerList = getPosition(playerList,"FWD")
 playerList = sortByPointsOverCost(playerList)
-playerList[0].printStats()
+for x in range(0,10):
+    playerList[x].printStats()
